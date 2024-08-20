@@ -1,4 +1,4 @@
-## KU Polls: Online Survey Questions 
+# KU Polls: Online Survey Questions 
 
 An application to conduct online polls and surveys based
 on the [Django Tutorial project](TODO-write-URL-of-the-django-tutorial-here), with
@@ -19,6 +19,6 @@ To be added.
 
 All project documents are in the [Project Wiki](../../wiki/Home).
 
-- [Vision Statement](../../wiki/Vision%20Statement)
+- [Vision and Scope](../../wiki/Vision%20and%20Scope)
 - [Requirements](../../wiki/Requirements)
 - [Project Plan](../../wiki/Project%20Plan)
