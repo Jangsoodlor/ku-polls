@@ -1,3 +1,8 @@
 li a {
-  color: green;
+  color: purple;
+}
+
+body {
+  background: white url("images/background.jpg") no-repeat;
+  background-size : cover;
 }
