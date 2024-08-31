@@ -7,6 +7,14 @@
 </head>
 
 <body>
+  {% if messages %}
+    <ul class="messages">
+    {% for msg in messages %}
+      <li class = "{{msg.tags}}">{{msg}}</li>
+    {%endfor%}
+    </ul>
+  {% endif %}
+
 <form action="{% url 'polls:vote' question.id %}" method="post">
   {% csrf_token %}
   <fieldset>
