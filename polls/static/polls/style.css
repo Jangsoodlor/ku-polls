@@ -1,8 +1,32 @@
-li a {
-  color: purple;
-}
 
 body {
-  background: white url("images/background.jpg") no-repeat;
+  background-color: white;
+  background: url("images/background.jpg") left fixed;
+  background-repeat: no-repeat;
   background-size : cover;
+  background-blend-mode: overlay;
+}
+
+
+ul {
+  list-style-type: none;
+}
+
+.success {
+  color:green;
+}
+
+.error {
+  color:red;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  text-decoration: none;
+}
+
+.row {
+  display:flexbox;
+  text-decoration: none;
 }

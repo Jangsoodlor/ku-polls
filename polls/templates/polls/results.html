@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'polls/style.css' %}">
   <title>{{question.question_text}} - Results</title>
 </head>
 
@@ -16,14 +18,29 @@
     </ul>
   {% endif %}
 
+  <div class="row">
+    <div class="column">
+      <ul>
+      {% for choice in question.choice_set.all %}
+        <li>
+          {{choice.choice_text}}
+        </li>
+      {%endfor%}
+      </ul>
+    </div>
 
-  <ul>
-  {% for choice in question.choice_set.all %}
-    <li>
-      {{choice.choice_text}} -- {{choice.votes}} vote{{choices.votes|pluralize}}
-    </li>
-  {%endfor%}
-  </ul>
+
+    <div class="column">
+      <ul>
+      {% for choice in question.choice_set.all %}
+        <li>
+          {{choice.votes}}
+        </li>
+      {%endfor%}
+      </ul>
+    </div>
+  </div>
+
 
   <a href = {% url 'polls:index' %}>
     <button type="submit">Back to List of Polls</button>
