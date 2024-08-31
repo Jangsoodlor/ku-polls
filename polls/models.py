@@ -23,7 +23,7 @@ class Question(models.Model):
         """Check whether the poll was published recently"""
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
-    
+
     def is_published(self):
         """Check whether the poll is published"""
         return self.pub_date <= timezone.now()
