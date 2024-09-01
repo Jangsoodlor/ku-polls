@@ -1,10 +1,11 @@
 :root{
   --text-color: #e5e9f0;
-  --text-highlight: #eceff4;
+  --text-highlight: white;
+  --white-bg: #d8dee9;
   --nord-7: #8fbcbb;
   --nord-8: #88c0d0;
-  --nord-9: #81a1c1;
-  --nord-10: #5e81ac;
+  --nord-12: #ebcb8b;
+  --affirmative: #a3be8c;
   --error: #bf616a;
 }
 body {
@@ -19,7 +20,7 @@ body {
 
 a{
   text-decoration: none;
-  color: var(--nord-7)
+  color: var(--nord-7);
 }
 
 a:hover{
@@ -32,26 +33,59 @@ ul {
 
 .header{
   color: var(--nord-8);
-  padding: 0 1em;
+  padding: 0 1.2em;
+}
+
+.detail-header {
+  padding:0;
 }
 
 .success {
-  color:green;
+  color: var(--affirmative);
+  font-size: 1.25em;
 }
 
 .error {
   color:var(--error);
   font-size: 1.5em;
   font-weight: bold;
+  margin: 0em;
+  padding: 0.5em 0;
+}
+
+.form {
+  padding: 1em 1em;
 }
 
 .column {
   float: left;
   width: 50%;
-  text-decoration: none;
 }
 
 .row {
   display:flexbox;
   text-decoration: none;
+}
+
+.button {
+  display: inline-block;
+  margin: 0.5em 0 0 2.2em;
+  padding: 0.5em 1em;
+  background-color: var(--white-bg);
+  border-radius: 25px;
+  border-style: none;
+}
+
+.button:hover {
+  background-color: var(--text-highlight);
+  transform: scale(1.15);
+}
+
+.form-button {
+  margin: 1em 0 0 1em;
+  background-color: var(--affirmative);
+}
+
+.form-button:hover{
+  background-color: #50fa7b;
 }

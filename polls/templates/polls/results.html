@@ -9,7 +9,7 @@
 </head>
 
 <body>
-  <h1>{{question.question_text}}</h1>
+  <h1 class="header">{{question.question_text}}</h1>
   {% if messages %}
     <ul class="messages">
     {% for msg in messages %}
@@ -41,9 +41,8 @@
     </div>
   </div>
 
-
   <a href = {% url 'polls:index' %}>
-    <button type="submit">Back to List of Polls</button>
+    <button type="submit" class="button">Back to List of Polls</button>
   </a>  
 
 </body>
