@@ -1,8 +1,98 @@
-li a {
-  color: purple;
+:root{
+  --text-color: #e5e9f0;
+  --text-highlight: white;
+  --white-bg: #d8dee9;
+  --nord-7: #8fbcbb;
+  --nord-8: #88c0d0;
+  --nord-12: #ebcb8b;
+  --affirmative: #a3be8c;
+  --error: #bf616a;
+}
+body {
+  background-color: white;
+  color: var(--text-color);
+  background: url("images/background.jpg") left fixed;
+  background-repeat: no-repeat;
+  background-size : cover;
+  background-blend-mode: overlay;
+  font-family: sans-serif;
 }
 
-body {
-  background: white url("images/background.jpg") no-repeat;
-  background-size : cover;
+a{
+  text-decoration: none;
+  color: var(--nord-7);
+}
+
+a:hover{
+  color:var(--text-highlight);
+}
+
+ul {
+  list-style-type: none;
+}
+
+.header{
+  color: var(--nord-8);
+  padding: 0 1em;
+}
+
+.detail-header {
+  padding:0;
+}
+
+.success {
+  color: var(--affirmative);
+  font-size: 1.25em;
+}
+
+.error {
+  color:var(--error);
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.5em 1.25em;
+}
+
+.form {
+  padding: 1em 1em;
+}
+
+.column {
+  float: left;
+  flex: 1;
+  padding: 0.5vh 0;
+}
+
+.right-column {
+  padding: 0.5vh 0 0.5vh 2em;
+}
+
+.row {
+  display: flex;
+  margin: 0 2em;
+}
+
+/* .table-container{
+} */
+
+.button {
+  display: inline-block;
+  margin: 0.5em 0 0.25em 2.2em;
+  padding: 0.5em 1em;
+  background-color: var(--white-bg);
+  border-radius: 25px;
+  border-style: none;
+}
+
+.button:hover {
+  background-color: var(--text-highlight);
+  transform: scale(1.15);
+}
+
+.form-button {
+  margin: 1em 0 0 1em;
+  background-color: var(--affirmative);
+}
+
+.form-button:hover{
+  background-color: #50fa7b;
 }
