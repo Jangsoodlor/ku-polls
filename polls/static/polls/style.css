@@ -1,15 +1,38 @@
-
+:root{
+  --text-color: #e5e9f0;
+  --text-highlight: #eceff4;
+  --nord-7: #8fbcbb;
+  --nord-8: #88c0d0;
+  --nord-9: #81a1c1;
+  --nord-10: #5e81ac;
+  --error: #bf616a;
+}
 body {
   background-color: white;
+  color: var(--text-color);
   background: url("images/background.jpg") left fixed;
   background-repeat: no-repeat;
   background-size : cover;
   background-blend-mode: overlay;
+  font-family: sans-serif;
 }
 
+a{
+  text-decoration: none;
+  color: var(--nord-7)
+}
+
+a:hover{
+  color:var(--text-highlight);
+}
 
 ul {
   list-style-type: none;
+}
+
+.header{
+  color: var(--nord-8);
+  padding: 0 1em;
 }
 
 .success {
@@ -17,7 +40,9 @@ ul {
 }
 
 .error {
-  color:red;
+  color:var(--error);
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
 .column {

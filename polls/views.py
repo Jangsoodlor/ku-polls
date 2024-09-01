@@ -28,7 +28,7 @@ class DetailView(generic.DetailView):
     def dispatch(self, request, *args, **kwargs):
         question = self.get_object()
         if not question.can_vote():
-            messages.error(request, "You don't have access")
+            messages.error(request, "ERROR: You don't have access to that poll")
             return HttpResponseRedirect(reverse("polls:index"))
         return super().dispatch(request, *args, **kwargs)
 
@@ -57,5 +57,5 @@ def vote(request, question_id):
     # Always return an HttpResponseRedirect after successfully dealing
     # with POST data. This prevents data from being posted twice if a
     # user hits the Back button.
-    messages.success(request, "Your choice successfully recorded. Thank you.")
+    messages.success(request, "Your choice has been successfully recorded. Thank you.")
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
