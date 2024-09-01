@@ -10,11 +10,9 @@
 
 <body>
   {% if messages %}
-    <ul class="messages">
     {% for msg in messages %}
-      <li class = "{{msg.tags}}">{{msg}}</li>
+      <p class = "{{msg.tags}}">{{msg}}</p>
     {%endfor%}
-    </ul>
   {% endif %}
 
 <form action="{% url 'polls:vote' question.id %}" method="post" class="form">

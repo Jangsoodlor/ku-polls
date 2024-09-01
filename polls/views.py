@@ -28,7 +28,7 @@ class DetailView(generic.DetailView):
     def dispatch(self, request, *args, **kwargs):
         question = self.get_object()
         if not question.can_vote():
-            messages.error(request, "ERROR: You don't have access to that poll")
+            messages.error(request, "ERROR: You don't have access to that poll!")
             return HttpResponseRedirect(reverse("polls:index"))
         return super().dispatch(request, *args, **kwargs)
 
