@@ -17,7 +17,16 @@
       <p class = "{{msg.tags}}">{{msg}}</p>
     {%endfor%}
   {% endif %}
-    <!-- {{ question.question_text }} -->
+  
+  {% if user.is_authenticated %}
+    Welcome Back, {{user.username}}
+    <form action="{% url 'logout' %}" method="post">
+      {% csrf_token %}
+      <button type="submit">LOG OUT</button>
+    </form>
+  {% else %}
+    Please <a href="{% url 'login' %}?next={{request.path}}">Login</a>
+  {% endif %}
 
   {% if latest_question_list %}
       {% for question in latest_question_list %}

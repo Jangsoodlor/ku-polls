@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - KU Polls</title>
+</head>
+<body>
+
+  {% if messages %}
+    {% for msg in messages %}
+      <p class="{{msg.tags}}">{{msg}}</p>
+    {% endfor %}
+  {% endif %}
+
+  <h1>Login</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p>
+      <button type="submit">Login</button>
+    </p>
+    <input type="hidden" name="next" value="{{next}}"/>
+  </form>
+ {# If you have a sign-up page, then add a link here #}
+
+</body>
+</html>
