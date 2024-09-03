@@ -6,7 +6,7 @@ from django.views import generic
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .models import Choice, Question
+from .models import Choice, Question, Vote
 
 
 class IndexView(generic.ListView):
@@ -21,7 +21,7 @@ class IndexView(generic.ListView):
 
 
 class DetailView(generic.DetailView):
-    """The view of the detail page"""
+    """Display choices for a poll"""
 
     model = Question
     template_name = "polls/detail.html"
@@ -44,7 +44,9 @@ class ResultsView(generic.DetailView):
 @login_required
 def vote(request, question_id):
     """The code for the voting process"""
+
     question = get_object_or_404(Question, pk=question_id)
+
     try:
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
     except (KeyError, Choice.DoesNotExist):
@@ -54,10 +56,15 @@ def vote(request, question_id):
             "error_message": "You didn't select a choice.",
         }
         return render(request, "polls/detail.html", context)
-    selected_choice.votes += 1
-    selected_choice.save()
-    # Always return an HttpResponseRedirect after successfully dealing
-    # with POST data. This prevents data from being posted twice if a
-    # user hits the Back button.
-    messages.success(request, "Your choice has been successfully recorded. Thank you.")
+
+    this_user = request.user
+    try:
+        vote = this_user.vote_set.get(choice__question=question, user=this_user)
+        vote.choice=selected_choice
+        vote.save()
+        messages.success(f'Your vote was changed to "{selected_choice.choice_text}"')
+    except Vote.DoesNotExist:
+        vote = Vote.objects.create(user=this_user, choice=selected_choice)
+        messages.success(request, "Your choice has been successfully recorded. Thank you.")
+
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
