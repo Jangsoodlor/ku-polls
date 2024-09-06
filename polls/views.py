@@ -5,11 +5,13 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from django.contrib import messages
+from django.contrib.auth import user_logged_in, user_login_failed, user_logged_out
 from django.contrib.auth.decorators import login_required
-
+from django.dispatch import receiver
 from .models import Choice, Question, Vote
 
 logger = logging.getLogger("polls")
+
 
 class IndexView(generic.ListView):
     """The view of the poll's index page"""
@@ -19,7 +21,8 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published questions."""
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
+        recent_questions = Question.objects.filter(pub_date__lte=timezone.now())
+        return recent_questions.order_by("-pub_date")[:5]
 
 
 class DetailView(generic.DetailView):
@@ -53,7 +56,7 @@ def vote(request, question_id):
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
     except (KeyError, Choice.DoesNotExist) as e:
         # Redisplay the question voting form.
-        logger.exception(e)
+        logger.exception(f"Non-existent choice {question_id} %s", e)
         context = {"question": question}
         messages.error(request, "You didn't select a choice.")
         return render(request, "polls/detail.html", context)
@@ -61,13 +64,43 @@ def vote(request, question_id):
     this_user = request.user
     try:
         vote = this_user.vote_set.get(choice__question=question, user=this_user)
-        vote.choice=selected_choice
+        vote.choice = selected_choice
         vote.save()
         logger.info(f"{this_user} submits a {vote}")
-        messages.success(request, f'Your vote was changed to "{selected_choice.choice_text}"')
+        messages.success(
+            request, f'Your vote was changed to "{selected_choice.choice_text}"'
+        )
     except Vote.DoesNotExist:
         vote = Vote.objects.create(user=this_user, choice=selected_choice)
         logger.info(f"{this_user} submits a {vote}")
         messages.success(request, f'You have voted "{selected_choice.choice_text}"')
 
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+
+
+def get_client_ip(request):
+    """Get the visitor’s IP address using request headers."""
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip
+
+
+@receiver(user_logged_in)
+def login_success(sender, request, user, **kwargs):
+    ip_addr = get_client_ip(request)
+    logger.info(f"{user.username} logged in from {ip_addr}")
+
+
+@receiver(user_logged_out)
+def logout_success(sender, request, user, **kwargs):
+    ip_addr = get_client_ip(request)
+    logger.info(f"{user.username} logged out from {ip_addr}")
+
+
+@receiver(user_login_failed)
+def login_fail(sender, credentials, request, **kwargs):
+    ip_addr = get_client_ip(request)
+    logger.waring(f"Failed login for {credentials['username']} from {ip_addr}")
