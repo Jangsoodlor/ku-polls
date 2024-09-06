@@ -9,27 +9,24 @@
 </head>
 
 <body>
-  {% if messages %}
-    {% for msg in messages %}
-      <p class = "{{msg.tags}}">{{msg}}</p>
-    {%endfor%}
-  {% endif %}
+  
+  <form action="{% url 'polls:vote' question.id %}" method="post" class="form">
+    {% csrf_token %}
+    <fieldset>
+      <legend><h1 class="header detail-header">{{ question.question_text }}</h1></legend>
+      {% if messages %}
+        {% for msg in messages %}
+          <p class = "{{msg.tags}}">{{msg}}</p>
+        {%endfor%}
+      {% endif %}
 
-<form action="{% url 'polls:vote' question.id %}" method="post" class="form">
-  {% csrf_token %}
-  <fieldset>
-    <legend><h1 class="header detail-header">{{ question.question_text }}</h1></legend>
-    {% if error_message %}
-      <p class="error">{{ error_message }}</p>
-    {% endif %}
-
-    {% for choice in question.choice_set.all %}
-      <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-      <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-    {% endfor %}
-  </fieldset>
-  <input type="submit" value="Vote" class="button form-button">
-</form>
+      {% for choice in question.choice_set.all %}
+        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+      {% endfor %}
+    </fieldset>
+    <input type="submit" value="Vote" class="button form-button">
+  </form>
 
 <a href="{% url 'polls:results' question.id %}">
   <button type="submit" class="button">Results</button>

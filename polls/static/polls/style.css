@@ -62,17 +62,10 @@ ul {
   padding: 0.5vh 0;
 }
 
-.right-column {
-  padding: 0.5vh 0 0.5vh 2em;
-}
-
 .row {
   display: flex;
   margin: 0 2em;
 }
-
-/* .table-container{
-} */
 
 .button {
   display: inline-block;
@@ -95,4 +88,12 @@ ul {
 
 .form-button:hover{
   background-color: #50fa7b;
+}
+
+.open-poll{
+  color : var(--affirmative)
+}
+
+.closed-poll{
+  color : var(--error)
 }

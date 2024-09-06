@@ -33,22 +33,26 @@
         <div class="row">
 
           <div class="column">
-            {% if question.can_vote %}
-              <a href="{% url 'polls:detail' question.id %}">
-                {{question.question_text}}
-              </a>
-            {% else %}
-              <a href="{% url 'polls:detail' question.id %}">
-                [CLOSED] {{question.question_text}}
-              </a>
-            {% endif %}
+            <a href="{% url 'polls:detail' question.id %}">
+              {{question.question_text}}
+            </a>
           </div>
 
-          <div class="column right-column">
+          <div class="column">
             <a href="{% url 'polls:results' question.id %}">
               results
             </a>
           </div>
+          
+          {% if question.can_vote %}
+            <div class="column open-poll">
+              Status : Open
+            </div>
+          {% else %}
+            <div class="column closed-poll">
+              Status : Closed
+            </div>
+          {% endif %}
 
         </div>
       {% endfor %}

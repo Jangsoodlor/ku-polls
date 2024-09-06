@@ -1,3 +1,4 @@
+import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -8,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Choice, Question, Vote
 
+logger = logging.getLogger("polls")
 
 class IndexView(generic.ListView):
     """The view of the poll's index page"""
@@ -49,12 +51,11 @@ def vote(request, question_id):
 
     try:
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
-    except (KeyError, Choice.DoesNotExist):
+    except (KeyError, Choice.DoesNotExist) as e:
         # Redisplay the question voting form.
-        context = {
-            "question": question,
-            "error_message": "You didn't select a choice.",
-        }
+        logger.exception(e)
+        context = {"question": question}
+        messages.error(request, "You didn't select a choice.")
         return render(request, "polls/detail.html", context)
 
     this_user = request.user
@@ -62,9 +63,11 @@ def vote(request, question_id):
         vote = this_user.vote_set.get(choice__question=question, user=this_user)
         vote.choice=selected_choice
         vote.save()
+        logger.info(f"{this_user} submits a {vote}")
         messages.success(request, f'Your vote was changed to "{selected_choice.choice_text}"')
     except Vote.DoesNotExist:
         vote = Vote.objects.create(user=this_user, choice=selected_choice)
-        messages.success(request, "Your choice has been successfully recorded. Thank you.")
+        logger.info(f"{this_user} submits a {vote}")
+        messages.success(request, f'You have voted "{selected_choice.choice_text}"')
 
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
