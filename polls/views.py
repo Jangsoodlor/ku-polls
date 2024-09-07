@@ -68,13 +68,17 @@ def vote(request, question_id):
         vote = this_user.vote_set.get(choice__question=question, user=this_user)
         vote.choice = selected_choice
         vote.save()
-        logger.info(f"{this_user} submits a {vote}")
+        logger.info(
+            f"{this_user} changed vote to {selected_choice.choice_text} on question {question.question_text}"
+        )
         messages.success(
             request, f'Your vote was changed to "{selected_choice.choice_text}"'
         )
     except Vote.DoesNotExist:
         vote = Vote.objects.create(user=this_user, choice=selected_choice)
-        logger.info(f"{this_user} submits a {vote}")
+        logger.info(
+            f"{this_user} voted {selected_choice.choice_text} on question {question.question_text}"
+        )
         messages.success(request, f'You have voted "{selected_choice.choice_text}"')
 
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
@@ -82,12 +86,14 @@ def vote(request, question_id):
 
 def get_client_ip(request):
     """Get the visitor’s IP address using request headers."""
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
-    else:
-        ip = request.META.get("REMOTE_ADDR")
-    return ip
+    if request:
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(",")[0]
+        else:
+            ip = request.META.get("REMOTE_ADDR")
+        return ip
+    return None
 
 
 @receiver(user_logged_in)
@@ -108,4 +114,4 @@ def logout_success(sender, request, user, **kwargs):
 def login_fail(sender, credentials, request, **kwargs):
     """Log when user failed to login"""
     ip_addr = get_client_ip(request)
-    logger.waring(f"Failed login for {credentials['username']} from {ip_addr}")
+    logger.warning(f"Failed login for {credentials['username']} from {ip_addr}")
