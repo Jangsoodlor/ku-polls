@@ -38,6 +38,18 @@ class DetailView(generic.DetailView):
             return HttpResponseRedirect(reverse("polls:index"))
         return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        question = self.get_object()
+        user = self.request.user
+        try:
+            marked_vote = user.vote_set.filter(choice__question=question)
+            if marked_vote:
+                data["marked_choice"] = marked_vote.first().choice
+        except AttributeError:
+            logger.error("Cannot check for marked choice of an unauthenticated visitor")
+        return data
+
 
 class ResultsView(generic.DetailView):
     """The view of the results page"""

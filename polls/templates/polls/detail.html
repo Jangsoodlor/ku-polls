@@ -1,52 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'polls/style.css' %}">
-  <title>{{question.question_text}}</title>
-</head>
+{% extends 'polls/base_template.html' %}
+{% block content %}
+<form action="{% url 'polls:vote' question.id %}" method="post" class="form">
+  {% csrf_token %}
+  <fieldset>
+    <legend><h1 class="header detail-header">{{ question.question_text }}</h1></legend>
+    {% if messages %}
+      {% for msg in messages %}
+        <div class = "row {{msg.tags}}">{{msg}}</div>
+      {%endfor%}
+    {% endif %}
 
-<body>
-  {% if user.is_authenticated %}
-  <form action="{% url 'logout' %}" method="post" class="top-container">
-    {% csrf_token %}
-      Welcome Back, {{user.username}}
-      <button type="submit">LOG OUT</button>
-    </form>
-  {% else %}
-  <div class="top-container">
-    Please <a href="{% url 'login' %}?next={{request.path}}">Login</a> to vote
-  </div>
-  {% endif %}
-  
-  <form action="{% url 'polls:vote' question.id %}" method="post" class="form">
-    {% csrf_token %}
-    <fieldset>
-      <legend><h1 class="header detail-header">{{ question.question_text }}</h1></legend>
-      {% if messages %}
-        {% for msg in messages %}
-          <div class = "row {{msg.tags}}">{{msg}}</div>
-        {%endfor%}
-      {% endif %}
-
-      {% for choice in question.choice_set.all %}
+    {% for choice in question.choice_set.all %}
+      {% if marked_choice == choice %}
+        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}", checked="checked">
+      {% else %}
         <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-      {% endfor %}
-    </fieldset>
-    <input type="submit" value="Vote" class="button form-button">
-  </form>
+      {% endif %}
+      <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+    {% endfor %}
+  </fieldset>
+  <input type="submit" value="Vote" class="button form-button">
+</form>
 
-  <a href="{% url 'polls:results' question.id %}">
-    <button type="submit" class="button">Results</button>
-  </a>
+<a href="{% url 'polls:results' question.id %}">
+  <button type="submit" class="button">Results</button>
+</a>
 
-  <a href = {% url 'polls:index' %}>
-    <button type="submit" class="button">Back to List of Polls</button>
-  </a>
-
-</body>
-
-</html>
+<a href = {% url 'polls:index' %}>
+  <button type="submit" class="button">Back to List of Polls</button>
+</a>
+{% endblock %}

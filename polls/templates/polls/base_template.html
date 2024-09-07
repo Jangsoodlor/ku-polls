@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+  {% block title %}
+  <title>KU Polls</title>
+  {% endblock %}
+</head>
+
+<body>
+  {% block header %}
+  <div class="top-container">
+    <a href="{% url 'polls:index' %}">
+      <h1 class="header polls-header">
+        KU-Polls
+      </h1>
+    </a>
+  
+    {% if user.is_authenticated %}
+    <form action="{% url 'logout' %}" method="post" class="auth-container">
+      {% csrf_token %}
+        Welcome&nbsp;Back,&nbsp;{{user.username}}
+        <button type="submit" class="button auth-button">LOG OUT</button>
+      </form>
+    {% else %}
+    <div class="auth-container">
+      <a href="{% url 'login' %}?next={{request.path}}">
+        <button type="submit", class="button auth-button">
+          Login
+        </button>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+  
+  {% if messages %}
+    {% for msg in messages %}
+      <div class = "messages {{msg.tags}}">{{msg}}</div>
+    {%endfor%}
+  {% endif %}
+  {% endblock %}
+
+
+  {% block content %}
+  {% endblock %}
+</body>
+</html>

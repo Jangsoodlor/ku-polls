@@ -1,66 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'polls/style.css' %}">
-  <title>Index - KU Polls</title>
-</head>
+{% extends 'polls/base_template.html' %}
 
-<body>
-  {% if user.is_authenticated %}
-  <form action="{% url 'logout' %}" method="post" class="top-container">
-    {% csrf_token %}
-      Welcome Back, {{user.username}}
-      <button type="submit">LOG OUT</button>
-    </form>
-  {% else %}
-  <div class="top-container">
-    Please <a href="{% url 'login' %}?next={{request.path}}">Login</a> to vote
-  </div>
-  {% endif %}
+{% block title %}
+  <title>
+    Index - KU-Polls
+  </title>
+{% endblock %}
 
-  <h1 class="header">
-    KU-Polls
-  </h1>
-  {% if messages %}
-    {% for msg in messages %}
-      <div class = "row {{msg.tags}}">{{msg}}</div>
-    {%endfor%}
-  {% endif %}
+{% block content %}
+{% if latest_question_list %}
+  {% for question in latest_question_list %}
+    <div class="row">
 
-  {% if latest_question_list %}
-      {% for question in latest_question_list %}
-        <div class="row">
+      <div class="long-column">
+        <a href="{% url 'polls:detail' question.id %}">
+          {{question.question_text}}
+        </a>
+      </div>
 
-          <div class="column">
-            <a href="{% url 'polls:detail' question.id %}">
-              {{question.question_text}}
-            </a>
-          </div>
-
-          <div class="column">
-            <a href="{% url 'polls:results' question.id %}">
-              results
-            </a>
-          </div>
-          
-          {% if question.can_vote %}
-            <div class="column open-poll">
-              Status : Open
-            </div>
-          {% else %}
-            <div class="column closed-poll">
-              Status : Closed
-            </div>
-          {% endif %}
-
+      <div class="column">
+        <a href="{% url 'polls:results' question.id %}">
+          results
+        </a>
+      </div>
+      
+      {% if question.can_vote %}
+        <div class="long-column open-poll">
+          Status : Open
         </div>
-      {% endfor %}
-  {% else %}
-      <p class="error">No polls are available.</p>
-  {% endif %}
-</body>
+      {% else %}
+        <div class="long-column closed-poll">
+          Status : Closed
+        </div>
+      {% endif %}
 
-</html>
+    </div>
+  {% endfor %}
+{% else %}
+  <p class="error">No polls are available.</p>
+{% endif %}
+
+{% endblock %}

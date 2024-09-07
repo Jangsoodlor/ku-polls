@@ -1,48 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'polls/style.css' %}">
-  <title>{{question.question_text}} - Results</title>
-</head>
-
-<body>
-  {% if user.is_authenticated %}
-  <form action="{% url 'logout' %}" method="post" class="top-container">
-    {% csrf_token %}
-      Welcome Back, {{user.username}}
-      <button type="submit">LOG OUT</button>
-    </form>
-  {% else %}
-  <div class="top-container">
-    Please <a href="{% url 'login' %}?next={{request.path}}">Login</a> to vote
-  </div>
-  {% endif %}
-
-  <h1 class="header">{{question.question_text}}</h1>
-  {% if messages %}
-    {% for msg in messages %}
-      <div class = "row {{msg.tags}}">{{msg}}</div>
-    {%endfor%}
-  {% endif %}
+{% extends 'polls/base_template.html' %}
+{% block content %}
+<h1 class="header">{{question.question_text}}</h1>
   
-  {% for choice in question.choice_set.all %}
-  <div class="row">
-    <div class="column">
-      {{choice.choice_text}}
-    </div>
-    <div class="column">
-      {{choice.votes}}
-    </div>
+{% for choice in question.choice_set.all %}
+<div class="row">
+  <div class="column">
+    {{choice.choice_text}}
   </div>
-  {% endfor %}
+  <div class="column">
+    {{choice.votes}}
+  </div>
+</div>
+{% endfor %}
 
-  <a href = {% url 'polls:index' %}>
-    <button type="submit" class="button">Back to List of Polls</button>
-  </a>  
+<a href = {% url 'polls:index' %}>
+  <button type="submit" class="button result-button">
+    Back to List of Polls
+  </button>
+</a>  
 
-</body>
-
-</html>
+{% endblock %}
