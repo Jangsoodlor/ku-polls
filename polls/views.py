@@ -54,11 +54,13 @@ def vote(request, question_id):
 
     try:
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
-    except (KeyError, Choice.DoesNotExist) as e:
+    except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
-        logger.exception(f"Non-existent choice {question_id} %s", e)
+        logger.error(
+            f"Failed to get selected choice or choice does not exists for question {question_id}"
+        )
         context = {"question": question}
-        messages.error(request, "You didn't select a choice.")
+        messages.error(request, "ERROR: You didn't select a choice.")
         return render(request, "polls/detail.html", context)
 
     this_user = request.user
@@ -90,17 +92,20 @@ def get_client_ip(request):
 
 @receiver(user_logged_in)
 def login_success(sender, request, user, **kwargs):
+    """Log when user successfully login"""
     ip_addr = get_client_ip(request)
     logger.info(f"{user.username} logged in from {ip_addr}")
 
 
 @receiver(user_logged_out)
 def logout_success(sender, request, user, **kwargs):
+    """Log when user successfully log out"""
     ip_addr = get_client_ip(request)
     logger.info(f"{user.username} logged out from {ip_addr}")
 
 
 @receiver(user_login_failed)
 def login_fail(sender, credentials, request, **kwargs):
+    """Log when user failed to login"""
     ip_addr = get_client_ip(request)
     logger.waring(f"Failed login for {credentials['username']} from {ip_addr}")

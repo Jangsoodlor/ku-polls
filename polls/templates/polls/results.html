@@ -9,13 +9,23 @@
 </head>
 
 <body>
+  {% if user.is_authenticated %}
+  <form action="{% url 'logout' %}" method="post" class="top-container">
+    {% csrf_token %}
+      Welcome Back, {{user.username}}
+      <button type="submit">LOG OUT</button>
+    </form>
+  {% else %}
+  <div class="top-container">
+    Please <a href="{% url 'login' %}?next={{request.path}}">Login</a> to vote
+  </div>
+  {% endif %}
+
   <h1 class="header">{{question.question_text}}</h1>
   {% if messages %}
-    <ul class="messages">
     {% for msg in messages %}
-      <li class = "{{msg.tags}}">{{msg}}</li>
+      <div class = "row {{msg.tags}}">{{msg}}</div>
     {%endfor%}
-    </ul>
   {% endif %}
   
   {% for choice in question.choice_set.all %}
