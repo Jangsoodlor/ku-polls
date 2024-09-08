@@ -1,11 +1,16 @@
+import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from django.contrib import messages
+from django.contrib.auth import user_logged_in, user_login_failed, user_logged_out
+from django.contrib.auth.decorators import login_required
+from django.dispatch import receiver
+from .models import Choice, Question, Vote
 
-from .models import Choice, Question
+logger = logging.getLogger("polls")
 
 
 class IndexView(generic.ListView):
@@ -16,11 +21,12 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published questions."""
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
+        recent_questions = Question.objects.filter(pub_date__lte=timezone.now())
+        return recent_questions.order_by("-pub_date")[:5]
 
 
 class DetailView(generic.DetailView):
-    """The view of the detail page"""
+    """Display choices for a poll"""
 
     model = Question
     template_name = "polls/detail.html"
@@ -32,6 +38,16 @@ class DetailView(generic.DetailView):
             return HttpResponseRedirect(reverse("polls:index"))
         return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        question = self.get_object()
+        user = self.request.user
+        if user.is_authenticated:
+            marked_vote = user.vote_set.filter(choice__question=question)
+            if marked_vote:
+                data["marked_choice"] = marked_vote.first().choice
+        return data
+
 
 class ResultsView(generic.DetailView):
     """The view of the results page"""
@@ -40,22 +56,72 @@ class ResultsView(generic.DetailView):
     template_name = "polls/results.html"
 
 
+@login_required
 def vote(request, question_id):
     """The code for the voting process"""
+
     question = get_object_or_404(Question, pk=question_id)
+
     try:
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
     except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
-        context = {
-            "question": question,
-            "error_message": "You didn't select a choice.",
-        }
+        logger.error(
+            f"Failed to get selected choice or choice does not exists for question {question_id}"
+        )
+        context = {"question": question}
+        messages.error(request, "ERROR: You didn't select a choice.")
         return render(request, "polls/detail.html", context)
-    selected_choice.votes += 1
-    selected_choice.save()
-    # Always return an HttpResponseRedirect after successfully dealing
-    # with POST data. This prevents data from being posted twice if a
-    # user hits the Back button.
-    messages.success(request, "Your choice has been successfully recorded. Thank you.")
+
+    this_user = request.user
+    try:
+        vote = this_user.vote_set.get(choice__question=question, user=this_user)
+        vote.choice = selected_choice
+        vote.save()
+        logger.info(
+            f"{this_user} changed vote to vote id: {selected_choice.id} on question id: {question.id}"
+        )
+        messages.success(
+            request, f'Your vote was changed to "{selected_choice.choice_text}"'
+        )
+    except Vote.DoesNotExist:
+        vote = Vote.objects.create(user=this_user, choice=selected_choice)
+        logger.info(
+            f"{this_user} voted vote id: {selected_choice.id} on question id: {question.id}"
+        )
+        messages.success(request, f'You have voted "{selected_choice.choice_text}"')
+
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+
+
+def get_client_ip(request):
+    """Get the visitor’s IP address using request headers."""
+    if request:
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(",")[0]
+        else:
+            ip = request.META.get("REMOTE_ADDR")
+        return ip
+    return None
+
+
+@receiver(user_logged_in)
+def login_success(sender, request, user, **kwargs):
+    """Log when user successfully login"""
+    ip_addr = get_client_ip(request)
+    logger.info(f"{user.username} logged in from {ip_addr}")
+
+
+@receiver(user_logged_out)
+def logout_success(sender, request, user, **kwargs):
+    """Log when user successfully log out"""
+    ip_addr = get_client_ip(request)
+    logger.info(f"{user.username} logged out from {ip_addr}")
+
+
+@receiver(user_login_failed)
+def login_fail(sender, credentials, request, **kwargs):
+    """Log when user failed to login"""
+    ip_addr = get_client_ip(request)
+    logger.warning(f"Failed login for {credentials['username']} from {ip_addr}")

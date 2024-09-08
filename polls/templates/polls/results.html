@@ -1,38 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'polls/style.css' %}">
-  <title>{{question.question_text}} - Results</title>
-</head>
-
-<body>
-  <h1 class="header">{{question.question_text}}</h1>
-  {% if messages %}
-    <ul class="messages">
-    {% for msg in messages %}
-      <li class = "{{msg.tags}}">{{msg}}</li>
-    {%endfor%}
-    </ul>
-  {% endif %}
+{% extends 'polls/base_template.html' %}
+{% block content %}
+<h1 class="header">{{question.question_text}}</h1>
   
-  {% for choice in question.choice_set.all %}
-  <div class="row">
-    <div class="column">
-      {{choice.choice_text}}
-    </div>
-    <div class="column">
-      {{choice.votes}}
-    </div>
+{% for choice in question.choice_set.all %}
+<div class="row">
+  <div class="column">
+    {{choice.choice_text}}
   </div>
-  {% endfor %}
+  <div class="column">
+    {{choice.votes}}
+  </div>
+</div>
+{% endfor %}
 
-  <a href = {% url 'polls:index' %}>
-    <button type="submit" class="button">Back to List of Polls</button>
-  </a>  
+<a href = {% url 'polls:index' %}>
+  <button type="submit" class="button result-button">
+    Back to List of Polls
+  </button>
+</a>  
 
-</body>
-
-</html>
+{% endblock %}
