@@ -4,11 +4,6 @@
   {% csrf_token %}
   <fieldset>
     <legend><h1 class="header detail-header">{{ question.question_text }}</h1></legend>
-    {% if messages %}
-      {% for msg in messages %}
-        <div class = "row {{msg.tags}}">{{msg}}</div>
-      {%endfor%}
-    {% endif %}
 
     {% for choice in question.choice_set.all %}
       {% if marked_choice == choice %}

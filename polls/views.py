@@ -42,12 +42,10 @@ class DetailView(generic.DetailView):
         data = super().get_context_data(**kwargs)
         question = self.get_object()
         user = self.request.user
-        try:
+        if user.is_authenticated:
             marked_vote = user.vote_set.filter(choice__question=question)
             if marked_vote:
                 data["marked_choice"] = marked_vote.first().choice
-        except AttributeError:
-            logger.error("Cannot check for marked choice of an unauthenticated visitor")
         return data
 
 
@@ -81,7 +79,7 @@ def vote(request, question_id):
         vote.choice = selected_choice
         vote.save()
         logger.info(
-            f"{this_user} changed vote to {selected_choice.choice_text} on question {question.question_text}"
+            f"{this_user} changed vote to vote id: {selected_choice.id} on question id: {question.id}"
         )
         messages.success(
             request, f'Your vote was changed to "{selected_choice.choice_text}"'
@@ -89,7 +87,7 @@ def vote(request, question_id):
     except Vote.DoesNotExist:
         vote = Vote.objects.create(user=this_user, choice=selected_choice)
         logger.info(
-            f"{this_user} voted {selected_choice.choice_text} on question {question.question_text}"
+            f"{this_user} voted vote id: {selected_choice.id} on question id: {question.id}"
         )
         messages.success(request, f'You have voted "{selected_choice.choice_text}"')
 
