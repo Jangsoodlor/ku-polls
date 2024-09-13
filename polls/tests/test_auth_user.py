@@ -86,7 +86,6 @@ class UserAuthTest(django.test.TestCase):
         then I am redirected to the login page
           or I receive a 403 response (FORBIDDEN)
         """
-
         # what choice to vote for?
         choice = self.question.choice_set.first()
         # the polls detail page has a form, each choice is identified by its id
@@ -157,7 +156,7 @@ class UserAuthTest(django.test.TestCase):
         self.assertEqual(choice.votes, 1)
 
     def test_user_can_delete_vote(self):
-        """Test that authenticated user can delete his vote"""
+        """Test that authenticated user can delete his vote."""
         choice = self.question.choice_set.filter(choice_text__contains="2").first()
         self.assertTrue(
             self.client.login(username=self.username, password=self.password)
