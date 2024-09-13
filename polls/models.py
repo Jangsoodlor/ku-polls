@@ -1,4 +1,4 @@
-"""Contains models for the poll application"""
+"""Contains models for the poll application."""
 
 import datetime
 from django.db import models
@@ -8,8 +8,9 @@ from django.contrib.auth.models import User
 
 class Question(models.Model):
     """
-    The Question model. Contains two fields, which are the question text
-    and the publication date.
+    The Question model.
+
+    Contains two fields, which are the question text and the publication date.
     """
 
     question_text = models.CharField(max_length=200)
@@ -19,20 +20,20 @@ class Question(models.Model):
     )
 
     def __str__(self):
-        """Returns the question's text"""
+        """Retrieve the question's text."""
         return self.question_text
 
     def was_published_recently(self):
-        """Check whether the poll was published recently"""
+        """Check whether the poll was published recently."""
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
     def is_published(self):
-        """Check whether the poll is published"""
+        """Check whether the poll is published."""
         return self.pub_date <= timezone.now()
 
     def can_vote(self):
-        """Check whether the user can vote on the poll"""
+        """Check whether the user can vote on the poll."""
         if self.end_date:
             return self.is_published() and timezone.now() <= self.end_date
         return self.is_published()
@@ -40,26 +41,30 @@ class Question(models.Model):
 
 class Choice(models.Model):
     """
-    The choice Model. It has Question as a Foreign Key, meaning that there can
-    be many choice to one question. Also contain the choice_text and votes fields
+    The choice Model.
+
+    There can be many choices to one question.
     """
 
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
-    # votes = models.IntegerField(default=0)
 
     @property
     def votes(self):
-        """return the vote of this choice"""
+        """Return the vote of this choice."""
         return self.vote_set.count()
 
     def __str__(self):
-        """Returns the choice's text"""
+        """Return the choice's text."""
         return self.choice_text
 
 
 class Vote(models.Model):
-    """A vote by the user to a choice in the poll"""
+    """
+    A vote by the user to a choice in the poll.
+
+    There can be many votes to one choice.
+    """
 
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

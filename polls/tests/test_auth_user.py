@@ -19,12 +19,15 @@ class UserAuthTest(django.test.TestCase):
 
     def setUp(self):
         """Set up the test."""
-        # superclass setUp creates a Client object and initializes test database
+        # superclass setUp creates a Client object
+        # and initializes test database
         super().setUp()
         self.username = "testuser"
         self.password = "FatChance!"
         self.user1 = User.objects.create_user(
-            username=self.username, password=self.password, email="testuser@nowhere.com"
+            username=self.username,
+            password=self.password,
+            email="testuser@nowhere.com"
         )
         self.user1.first_name = "Tester"
         self.user1.save()
@@ -114,7 +117,7 @@ class UserAuthTest(django.test.TestCase):
 
     def test_user_can_vote(self):
         """Test that authorized users can successfully vote in a poll."""
-        choice = self.question.choice_set.filter(choice_text__contains="2").first()
+        choice = self.question.choice_set.first()
         self.assertTrue(
             self.client.login(username=self.username, password=self.password)
         )
@@ -157,7 +160,7 @@ class UserAuthTest(django.test.TestCase):
 
     def test_user_can_delete_vote(self):
         """Test that authenticated user can delete his vote."""
-        choice = self.question.choice_set.filter(choice_text__contains="2").first()
+        choice = self.question.choice_set.first()
         self.assertTrue(
             self.client.login(username=self.username, password=self.password)
         )

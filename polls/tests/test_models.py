@@ -9,7 +9,7 @@ from polls.models import Question
 
 def create_question(question_text, days):
     """
-    Create a question, with the given `question_text` with publication date offset.
+    Create a question with the given question_text and publication date offset.
 
     (negative for questions published in the past,
     positive for questions that have yet to be published.
@@ -44,20 +44,22 @@ class WasPublishedRecentlyTests(TestCase):
     """Test whether was_published_recently method is working properly."""
 
     def test_was_published_recently_with_future_question(self):
-        """was_published_recently() returns False for questions whose pub_date is in the future."""
+        """Test the cases of questions whose pub_date is in the future."""
         time = timezone.now() + datetime.timedelta(days=30)
         future_question = Question(pub_date=time)
         self.assertIs(future_question.was_published_recently(), False)
 
     def test_was_published_recently_with_old_question(self):
-        """was_published_recently() returns False for questions that are older than 1 day."""
+        """Test the cases of questions that are older than 1 day."""
         time = timezone.now() - datetime.timedelta(days=1, seconds=1)
         old_question = Question(pub_date=time)
         self.assertIs(old_question.was_published_recently(), False)
 
     def test_was_published_recently_with_recent_question(self):
-        """was_published_recently() returns True for questions that aren't older than 1 day."""
-        time = timezone.now() - datetime.timedelta(hours=23, minutes=59, seconds=59)
+        """Test the cases of questions that aren't older than 1 day."""
+        time = timezone.now() - datetime.timedelta(hours=23,
+                                                   minutes=59,
+                                                   seconds=59)
         recent_question = Question(pub_date=time)
         self.assertIs(recent_question.was_published_recently(), True)
 

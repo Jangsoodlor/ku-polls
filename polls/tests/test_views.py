@@ -52,7 +52,7 @@ class QuestionIndexViewTests(TestCase):
         self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
     def test_past_question(self):
-        """Questions with a pub_date in the past are displayed on the index page."""
+        """Published questions are displayed on the index page."""
         question = create_question(question_text="Past question.", days=-30)
         response = self.client.get(reverse("polls:index"))
         self.assertQuerySetEqual(
@@ -61,14 +61,18 @@ class QuestionIndexViewTests(TestCase):
         )
 
     def test_future_question(self):
-        """Questions with a pub_date in the future aren't displayed on the index page."""
+        """Unpublished questions aren't displayed on the index page."""
         create_question(question_text="Future question.", days=30)
         response = self.client.get(reverse("polls:index"))
         self.assertContains(response, "No polls are available.")
         self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
     def test_future_question_and_past_question(self):
-        """Even if both past and future questions exist, only past questions are displayed."""
+        """
+        Only past questions should be displayed.
+
+        In the case that there're both past and future questions.
+        """
         question = create_question(question_text="Past question.", days=-30)
         create_question(question_text="Future question.", days=30)
         response = self.client.get(reverse("polls:index"))
@@ -97,7 +101,8 @@ class QuestionDetailViewTests(TestCase):
 
         Redirects to the index page.
         """
-        future_question = create_question(question_text="Future Question", days=5)
+        future_question = create_question(question_text="Future Question",
+                                          days=5)
         url = reverse("polls:detail", args=(future_question.id,))
         response = self.client.get(url)
         self.assertRedirects(response, reverse("polls:index"))
@@ -108,7 +113,8 @@ class QuestionDetailViewTests(TestCase):
 
         Displays the question's text.
         """
-        past_question = create_question(question_text="Past Question.", days=-5)
+        past_question = create_question(question_text="Past Question.",
+                                        days=-5)
         url = reverse("polls:detail", args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)

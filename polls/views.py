@@ -1,3 +1,5 @@
+"""Contains the views of the poll application."""
+
 import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -5,7 +7,9 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from django.contrib import messages
-from django.contrib.auth import user_logged_in, user_login_failed, user_logged_out
+from django.contrib.auth import user_logged_in, \
+                                user_login_failed, \
+                                user_logged_out
 from django.contrib.auth.decorators import login_required
 from django.dispatch import receiver
 from .models import Choice, Question, Vote
@@ -14,31 +18,37 @@ logger = logging.getLogger("polls")
 
 
 class IndexView(generic.ListView):
-    """The view of the poll's index page"""
+    """The view of the poll's index page."""
 
     template_name = "polls/index.html"
     context_object_name = "latest_question_list"
 
     def get_queryset(self):
         """Return the last five published questions."""
-        recent_questions = Question.objects.filter(pub_date__lte=timezone.now())
-        return recent_questions.order_by("-pub_date")
+        questions = Question.objects.filter(pub_date__lte=timezone.now())
+        return questions.order_by("-pub_date")
 
 
 class DetailView(generic.DetailView):
-    """Display choices for a poll"""
+    """Display choices for a poll."""
 
     model = Question
     template_name = "polls/detail.html"
 
     def dispatch(self, request, *args, **kwargs):
+        """Check whether the question can be voted on.
+
+        If not, then redirects to the index page with error message.
+        """
         question = self.get_object()
         if not question.can_vote():
-            messages.error(request, "ERROR: You don't have access to that poll!")
+            error_text = "ERROR: You don't have access to that poll!"
+            messages.error(request, error_text)
             return HttpResponseRedirect(reverse("polls:index"))
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        """Add user's selected choice to the context, if exists."""
         data = super().get_context_data(**kwargs)
         question = self.get_object()
         user = self.request.user
@@ -50,7 +60,7 @@ class DetailView(generic.DetailView):
 
 
 class ResultsView(generic.DetailView):
-    """The view of the results page"""
+    """The view of the results page."""
 
     model = Question
     template_name = "polls/results.html"
@@ -58,8 +68,7 @@ class ResultsView(generic.DetailView):
 
 @login_required
 def vote(request, question_id):
-    """The code for the voting process"""
-
+    """If the user is eligible to vote, cast a vote to the active question."""
     question = get_object_or_404(Question, pk=question_id)
 
     try:
@@ -67,7 +76,7 @@ def vote(request, question_id):
     except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
         logger.error(
-            f"Failed to get selected choice or choice does not exists for question {question_id}"
+            f"Failed to get selected choice for question {question_id}"
         )
         context = {"question": question}
         messages.error(request, "ERROR: You didn't select a choice.")
@@ -75,44 +84,49 @@ def vote(request, question_id):
 
     this_user = request.user
     try:
-        vote = this_user.vote_set.get(choice__question=question, user=this_user)
+        vote = this_user.vote_set.get(choice__question=question,
+                                      user=this_user)
         vote.choice = selected_choice
         vote.save()
+        vote_id = selected_choice.id
         logger.info(
-            f"{this_user} changed vote to vote id: {selected_choice.id} on question id: {question.id}"
+            f"{this_user} changed vote to vote id: {vote_id} \
+on question id: {question.id}"
         )
-        messages.success(
-            request, f'Your vote was changed to "{selected_choice.choice_text}"'
-        )
+        messages.success(request, f'Your vote was changed to \
+"{selected_choice.choice_text}"')
     except Vote.DoesNotExist:
         vote = Vote.objects.create(user=this_user, choice=selected_choice)
         logger.info(
-            f"{this_user} voted vote id: {selected_choice.id} on question id: {question.id}"
+            f"{this_user} voted vote id: {selected_choice.id} \
+on question id: {question.id}"
         )
-        messages.success(request, f'You have voted "{selected_choice.choice_text}"')
+        messages.success(request, f'You have voted \
+"{selected_choice.choice_text}"')
 
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
 
 @login_required
 def unvote(request, choice_id):
-    """Delete the user's vote, if exists"""
+    """Delete the user's vote, if exists."""
     this_user = request.user
     try:
         choice = get_object_or_404(Choice, pk=choice_id)
         vote = this_user.vote_set.get(choice=choice, user=this_user)
-        logger.info(
-            f"{this_user} deleted vote id: {vote.id} on question id: {choice.question.id}"
-        )
+        logger.info(f"{this_user} deleted vote id: {vote.id} \
+on question id: {choice.question.id}")
         vote.delete()
         messages.success(request, "You've successfully deleted your vote")
     except Vote.DoesNotExist:
         messages.error("ERROR: You haven't vote yet")
         logger.error(
-            f"{this_user} tried to delete non-existent vote on question id: {choice.question.id}"
+            f"{this_user} tried to delete non-existent vote \
+on question id: {choice.question.id}"
         )
 
-    return HttpResponseRedirect(reverse("polls:results", args=(choice.question.id,)))
+    return HttpResponseRedirect(reverse("polls:results",
+                                        args=(choice.question.id,)))
 
 
 def get_client_ip(request):
@@ -129,20 +143,21 @@ def get_client_ip(request):
 
 @receiver(user_logged_in)
 def login_success(sender, request, user, **kwargs):
-    """Log when user successfully login"""
+    """Log when user successfully login."""
     ip_addr = get_client_ip(request)
     logger.info(f"{user.username} logged in from {ip_addr}")
 
 
 @receiver(user_logged_out)
 def logout_success(sender, request, user, **kwargs):
-    """Log when user successfully log out"""
+    """Log when user successfully log out."""
     ip_addr = get_client_ip(request)
     logger.info(f"{user.username} logged out from {ip_addr}")
 
 
 @receiver(user_login_failed)
 def login_fail(sender, credentials, request, **kwargs):
-    """Log when user failed to login"""
+    """Log when user failed to login."""
     ip_addr = get_client_ip(request)
-    logger.warning(f"Failed login for {credentials['username']} from {ip_addr}")
+    logger.warning(f"Failed login for {credentials['username']} \
+from {ip_addr}")
