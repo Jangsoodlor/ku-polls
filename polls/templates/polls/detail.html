@@ -18,9 +18,10 @@
 </form>
 
 {% if marked_choice %}
-  <a href="{% url 'polls:unvote' marked_choice.id %}">
-    <button type="submit" class="button">Delete Vote</button>
-  </a>
+  <form action="{% url 'polls:unvote' marked_choice.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="button" method="post">Delete Vote</button>
+  </form>
 {% endif %}
 
 <a href="{% url 'polls:results' question.id %}">

@@ -155,3 +155,18 @@ class UserAuthTest(django.test.TestCase):
         vote_object = choice.vote_set.get(user=self.user1)
         self.assertEqual(vote_object.user, self.user1)
         self.assertEqual(choice.votes, 1)
+
+    def test_user_can_delete_vote(self):
+        """Test that authenticated user can delete his vote"""
+        choice = self.question.choice_set.filter(choice_text__contains="2").first()
+        self.assertTrue(
+            self.client.login(username=self.username, password=self.password)
+        )
+
+        form_data = {"choice": f"{choice.id}"}
+        self.client.post(self.vote_url, form_data)
+        form_data = {"choice": f"{choice.id}"}
+        self.client.post(self.vote_url, form_data)
+        unvote_url = reverse("polls:unvote", args=[choice.id])
+        self.client.post(unvote_url)
+        self.assertEqual(choice.vote_set.filter(user=self.user1).count(), 0)
