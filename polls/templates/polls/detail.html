@@ -17,6 +17,12 @@
   <input type="submit" value="Vote" class="button form-button">
 </form>
 
+{% if marked_choice %}
+  <a href="{% url 'polls:unvote' marked_choice.id %}">
+    <button type="submit" class="button">Delete Vote</button>
+  </a>
+{% endif %}
+
 <a href="{% url 'polls:results' question.id %}">
   <button type="submit" class="button">Results</button>
 </a>

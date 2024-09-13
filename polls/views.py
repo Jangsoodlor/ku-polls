@@ -22,7 +22,7 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """Return the last five published questions."""
         recent_questions = Question.objects.filter(pub_date__lte=timezone.now())
-        return recent_questions.order_by("-pub_date")[:5]
+        return recent_questions.order_by("-pub_date")
 
 
 class DetailView(generic.DetailView):
@@ -92,6 +92,27 @@ def vote(request, question_id):
         messages.success(request, f'You have voted "{selected_choice.choice_text}"')
 
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+
+
+@login_required
+def unvote(request, choice_id):
+    """Delete the user's vote, if exists"""
+    this_user = request.user
+    try:
+        choice = get_object_or_404(Choice, pk=choice_id)
+        vote = this_user.vote_set.get(choice=choice, user=this_user)
+        logger.info(
+            f"{this_user} deleted vote id: {vote.id} on question id: {choice.question.id}"
+        )
+        vote.delete()
+        messages.success(request, "You've successfully deleted your vote")
+    except Vote.DoesNotExist:
+        messages.error("ERROR: You haven't vote yet")
+        logger.error(
+            f"{this_user} tried to delete non-existent vote on question id: {choice.question.id}"
+        )
+
+    return HttpResponseRedirect(reverse("polls:results", args=(choice.question.id,)))
 
 
 def get_client_ip(request):
