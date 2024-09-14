@@ -1,4 +1,4 @@
-name: Flake8 & Flake8 Docstrings
+name: Lint with Flake8
 
 on:
   push:
@@ -30,4 +30,4 @@ jobs:
         flake8 polls/tests polls/views.py --count --statistics --exclude __init__.py
     - name: Lint models with flake8
       run: |
-        flake8 polls/tests polls/views.py --count --statistics --max-line-length=100
+        flake8 polls/models.py --count --statistics --max-line-length=100
