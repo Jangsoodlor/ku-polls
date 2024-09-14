@@ -20,7 +20,7 @@
 {% if marked_choice %}
   <form action="{% url 'polls:unvote' marked_choice.id %}" method="post">
     {% csrf_token %}
-    <button type="submit" class="button" method="post">Delete Vote</button>
+    <button type="submit" class="button poll-delete-button" method="post">Delete Vote</button>
   </form>
 {% endif %}
 

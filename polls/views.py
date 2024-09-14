@@ -2,7 +2,7 @@
 
 import logging
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
@@ -42,7 +42,7 @@ class DetailView(generic.DetailView):
         """
         question = self.get_object()
         if not question.can_vote():
-            error_text = "ERROR: You don't have access to that poll!"
+            error_text = "Access Denied."
             messages.error(request, error_text)
             return HttpResponseRedirect(reverse("polls:index"))
         return super().dispatch(request, *args, **kwargs)
@@ -78,9 +78,9 @@ def vote(request, question_id):
         logger.error(
             f"Failed to get selected choice for question {question_id}"
         )
-        context = {"question": question}
-        messages.error(request, "ERROR: You didn't select a choice.")
-        return render(request, "polls/detail.html", context)
+        messages.error(request, "Please re-select the choice again.")
+        return HttpResponseRedirect(reverse("polls:detail",
+                                            args=(question.id,)))
 
     this_user = request.user
     try:

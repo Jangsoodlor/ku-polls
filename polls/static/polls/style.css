@@ -113,6 +113,15 @@ ul {
   background-color: #50fa7b;
 }
 
+.poll-delete-button {
+  margin: 1vh 1vw;
+  background-color: var(--error);
+}
+
+.poll-delete-button:hover{
+  background-color: coral;
+}
+
 .result-button{
   margin: 2vh 3vw;
 }
