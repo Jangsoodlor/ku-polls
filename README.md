@@ -1,4 +1,6 @@
 # KU Polls
+[![Django CI](https://github.com/Jangsoodlor/ku-polls/actions/workflows/django.yml/badge.svg)](https://github.com/Jangsoodlor/ku-polls/actions/workflows/django.yml)
+[![Lint with Flake8](https://github.com/Jangsoodlor/ku-polls/actions/workflows/style-checking.yml/badge.svg)](https://github.com/Jangsoodlor/ku-polls/actions/workflows/style-checking.yml)
 
 An application to conduct online polls and surveys based
 on the [Django Tutorial project](https://docs.djangoproject.com/en/5.1/intro/tutorial01/), with

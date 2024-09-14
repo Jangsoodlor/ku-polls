@@ -1,9 +1,12 @@
 # KU Polls Installation Guide
 
-1. Clone this repository, or download it as a zip file and extract it.
+1. Have Python version 3.11 or newer installed on your machine
+
+1. Clone this repository, or download it as a zip file and extract it
     ```
     git clone https://github.com/Jangsoodlor/ku-polls.git
     ```
+
 1. Navigate to the project's directory
     ```
     cd ku-polls
@@ -27,6 +30,11 @@
 1. Install required dependencies 
     ```
     pip install -r requirements.txt
+    ```
+
+1. Migrate the Database
+    ```
+    python manage.py migrate
     ```
 
 1. Load polls and users data
