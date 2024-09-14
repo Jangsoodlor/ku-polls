@@ -42,4 +42,14 @@
     python manage.py loaddata data/polls-v4.json data/votes-v4.json data/users.json
     ```
 
+1. Create `.env` file
+    ```
+    cp sample.env .env
+    ```
+
+1. In `.env` file, set `DEBUG` to `True`
+    ```
+    DEBUG = True
+    ```
+
 1. [Run the application](README.md#running-the-application)
