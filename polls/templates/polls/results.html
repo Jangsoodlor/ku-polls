@@ -1,4 +1,11 @@
 {% extends 'polls/base_template.html' %}
+
+{% block title %}
+  <title>
+    Results - {{question.question_text}}
+  </title>
+{% endblock %}
+
 {% block content %}
 <h1 class="header">{{question.question_text}}</h1>
   
@@ -12,6 +19,12 @@
   </div>
 </div>
 {% endfor %}
+
+<a href = {% url 'polls:detail' question.id %}>
+  <button type="submit" class="button result-button">
+    Change Vote
+  </button>
+</a>
 
 <a href = {% url 'polls:index' %}>
   <button type="submit" class="button result-button">
