@@ -113,6 +113,28 @@ ul {
   background-color: #50fa7b;
 }
 
+.login-button {
+  display: flex;
+  left: 50%;
+  background-color: var(--affirmative);
+  align-items: center;
+  margin: 0;
+  position: relative;
+}
+
+.login-button:hover{
+  background-color: #50fa7b;
+}
+
+.poll-delete-button {
+  margin: 0vh 1vw 2vh;
+  background-color: var(--error);
+}
+
+.poll-delete-button:hover{
+  background-color: coral;
+}
+
 .result-button{
   margin: 2vh 3vw;
 }
@@ -137,4 +159,13 @@ ul {
   align-items: center;
   width: 100;
   margin: 0;
+}
+
+.centre-div{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  /* align-self: center; */
 }

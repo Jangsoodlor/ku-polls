@@ -15,13 +15,19 @@ from mysite import settings
 
 
 class UserAuthTest(django.test.TestCase):
+    """Test user authentication."""
+
     def setUp(self):
-        # superclass setUp creates a Client object and initializes test database
+        """Set up the test."""
+        # superclass setUp creates a Client object
+        # and initializes test database
         super().setUp()
         self.username = "testuser"
         self.password = "FatChance!"
         self.user1 = User.objects.create_user(
-            username=self.username, password=self.password, email="testuser@nowhere.com"
+            username=self.username,
+            password=self.password,
+            email="testuser@nowhere.com"
         )
         self.user1.first_name = "Tester"
         self.user1.save()
@@ -33,6 +39,7 @@ class UserAuthTest(django.test.TestCase):
             choice = Choice(choice_text=f"Choice {n}", question=q)
             choice.save()
         self.question = q
+        self.vote_url = reverse("polls:vote", args=[self.question.id])
 
     def test_logout(self):
         """A user can logout using the logout url.
@@ -82,50 +89,46 @@ class UserAuthTest(django.test.TestCase):
         then I am redirected to the login page
           or I receive a 403 response (FORBIDDEN)
         """
-        vote_url = reverse("polls:vote", args=[self.question.id])
-
         # what choice to vote for?
         choice = self.question.choice_set.first()
         # the polls detail page has a form, each choice is identified by its id
         form_data = {"choice": f"{choice.id}"}
-        response = self.client.post(vote_url, form_data)
+        response = self.client.post(self.vote_url, form_data)
         # should be redirected to the login page
         self.assertEqual(response.status_code, 302)  # could be 303
         # this test fails because reverse('login') does not include
         # the query parameter ?next=/polls/1/vote/
         # self.assertRedirects(response, reverse('login') )
         # How to fix it?
-        login_with_next = f"{reverse('login')}?next={vote_url}"
+        login_with_next = f"{reverse('login')}?next={self.vote_url}"
         self.assertRedirects(response, login_with_next)
 
     def test_wrong_password(self):
-        """Test when user submits a wrong password"""
+        """Test when user submits a wrong password."""
         wrong_password = self.password + "junk"
         user = authenticate(username=self.username, password=wrong_password)
         self.assertIsNone(user)
 
     def test_invalid_user(self):
-        """Test when invalid user is trying to log in"""
+        """Test when invalid user is trying to log in."""
         invalid_username = self.username + "skibidi_toilet"
         user = authenticate(username=invalid_username, password=self.password)
         self.assertIsNone(user)
 
     def test_user_can_vote(self):
-        """Test that authorized users can successfully vote in a poll"""
-        vote_url = reverse("polls:vote", args=[self.question.id])
+        """Test that authorized users can successfully vote in a poll."""
         choice = self.question.choice_set.first()
         self.assertTrue(
             self.client.login(username=self.username, password=self.password)
         )
 
         form_data = {"choice": f"{choice.id}"}
-        self.client.post(vote_url, form_data)
+        self.client.post(self.vote_url, form_data)
         vote_object = choice.vote_set.get(user=self.user1)
         self.assertEqual(vote_object.user, self.user1)
 
     def test_user_can_change_vote(self):
-        """Test that the user can successfully change vote"""
-        vote_url = reverse("polls:vote", args=[self.question.id])
+        """Test that the user can successfully change vote."""
         choice_before = self.question.choice_set.first()
         choice_after = self.question.choice_set.get(choice_text__contains="2")
         self.assertTrue(
@@ -134,16 +137,15 @@ class UserAuthTest(django.test.TestCase):
 
         form_data_before = {"choice": f"{choice_before.id}"}
         form_data_after = {"choice": f"{choice_after.id}"}
-        self.client.post(vote_url, form_data_before)
-        self.client.post(vote_url, form_data_after)
+        self.client.post(self.vote_url, form_data_before)
+        self.client.post(self.vote_url, form_data_after)
         vote_object = choice_after.vote_set.get(user=self.user1)
         self.assertEqual(choice_before.votes, 0)
         self.assertEqual(choice_after.votes, 1)
         self.assertEqual(vote_object.user, self.user1)
 
     def test_one_vote_per_user(self):
-        """Test that one user can vote only once on a question"""
-        vote_url = reverse("polls:vote", args=[self.question.id])
+        """Test that one user can vote only once on a question."""
         choice = self.question.choice_set.first()
         self.assertTrue(
             self.client.login(username=self.username, password=self.password)
@@ -151,7 +153,22 @@ class UserAuthTest(django.test.TestCase):
 
         form_data = {"choice": f"{choice.id}"}
         for _ in range(5):
-            self.client.post(vote_url, form_data)
+            self.client.post(self.vote_url, form_data)
         vote_object = choice.vote_set.get(user=self.user1)
         self.assertEqual(vote_object.user, self.user1)
         self.assertEqual(choice.votes, 1)
+
+    def test_user_can_delete_vote(self):
+        """Test that authenticated user can delete his vote."""
+        choice = self.question.choice_set.first()
+        self.assertTrue(
+            self.client.login(username=self.username, password=self.password)
+        )
+
+        form_data = {"choice": f"{choice.id}"}
+        self.client.post(self.vote_url, form_data)
+        form_data = {"choice": f"{choice.id}"}
+        self.client.post(self.vote_url, form_data)
+        unvote_url = reverse("polls:unvote", args=[choice.id])
+        self.client.post(unvote_url)
+        self.assertEqual(choice.vote_set.filter(user=self.user1).count(), 0)

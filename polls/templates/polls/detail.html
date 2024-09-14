@@ -1,4 +1,11 @@
 {% extends 'polls/base_template.html' %}
+
+{% block title %}
+  <title>
+    {{question.question_text}}
+  </title>
+{% endblock %}
+
 {% block content %}
 <form action="{% url 'polls:vote' question.id %}" method="post" class="form">
   {% csrf_token %}
@@ -16,6 +23,13 @@
   </fieldset>
   <input type="submit" value="Vote" class="button form-button">
 </form>
+
+{% if marked_choice %}
+  <form action="{% url 'polls:unvote' marked_choice.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="button poll-delete-button" method="post">Delete Vote</button>
+  </form>
+{% endif %}
 
 <a href="{% url 'polls:results' question.id %}">
   <button type="submit" class="button">Results</button>
