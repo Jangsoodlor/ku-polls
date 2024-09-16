@@ -126,6 +126,8 @@ on question id: {question.id}")
             f"{this_user} tried to delete non-existent vote \
 on question id: {question.id}"
         )
+        return HttpResponseRedirect(reverse("polls:detail",
+                                            args=(question.id,)))
 
     return HttpResponseRedirect(reverse("polls:results",
                                         args=(question.id,)))
