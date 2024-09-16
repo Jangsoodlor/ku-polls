@@ -20,12 +20,6 @@
 </div>
 {% endfor %}
 
-<a href = {% url 'polls:detail' question.id %}>
-  <button type="submit" class="button result-button">
-    Change Vote
-  </button>
-</a>
-
 <a href = {% url 'polls:index' %}>
   <button type="submit" class="button result-button">
     Back to List of Polls
