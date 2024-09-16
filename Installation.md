@@ -52,4 +52,9 @@
     DEBUG = True
     ```
 
+1. Run tests
+    ```
+    python manage.py test
+    ```
+
 1. [Run the application](README.md#running-the-application)

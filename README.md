@@ -27,6 +27,7 @@ https://cpske.github.io/ISP) course at [Kasetsart University](https://www.ku.ac.
 ## Demo Users
 |username|password|
 |-|-|
+|admin|verysecure|
 |demo1|hackme11|
 |demo2|hackme22|
 |demo3|hackme33|
