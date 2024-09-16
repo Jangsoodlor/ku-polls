@@ -169,6 +169,6 @@ class UserAuthTest(django.test.TestCase):
         self.client.post(self.vote_url, form_data)
         form_data = {"choice": f"{choice.id}"}
         self.client.post(self.vote_url, form_data)
-        unvote_url = reverse("polls:unvote", args=[choice.id])
+        unvote_url = reverse("polls:unvote", args=[self.question.id])
         self.client.post(unvote_url)
         self.assertEqual(choice.vote_set.filter(user=self.user1).count(), 0)

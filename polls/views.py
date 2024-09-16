@@ -108,25 +108,27 @@ on question id: {question.id}"
 
 
 @login_required
-def unvote(request, choice_id):
+def unvote(request, question_id):
     """Delete the user's vote, if exists."""
+    question = get_object_or_404(Question, pk=question_id)
     this_user = request.user
+
     try:
-        choice = get_object_or_404(Choice, pk=choice_id)
-        vote = this_user.vote_set.get(choice=choice, user=this_user)
+        vote = this_user.vote_set.get(choice__question=question,
+                                      user=this_user)
         logger.info(f"{this_user} deleted vote id: {vote.id} \
-on question id: {choice.question.id}")
+on question id: {question.id}")
         vote.delete()
         messages.success(request, "You've successfully deleted your vote")
     except Vote.DoesNotExist:
-        messages.error("ERROR: You haven't vote yet")
+        messages.error(request, "ERROR: You haven't vote yet")
         logger.error(
             f"{this_user} tried to delete non-existent vote \
-on question id: {choice.question.id}"
+on question id: {question.id}"
         )
 
     return HttpResponseRedirect(reverse("polls:results",
-                                        args=(choice.question.id,)))
+                                        args=(question.id,)))
 
 
 def get_client_ip(request):
