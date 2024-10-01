@@ -25,9 +25,7 @@ class UserAuthTest(django.test.TestCase):
         self.username = "testuser"
         self.password = "FatChance!"
         self.user1 = User.objects.create_user(
-            username=self.username,
-            password=self.password,
-            email="testuser@nowhere.com"
+            username=self.username, password=self.password, email="testuser@nowhere.com"
         )
         self.user1.first_name = "Tester"
         self.user1.save()

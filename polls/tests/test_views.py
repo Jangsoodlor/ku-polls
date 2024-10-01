@@ -1,4 +1,5 @@
 """Test that views display elements properly."""
+
 import datetime
 
 from django.test import TestCase
@@ -101,8 +102,7 @@ class QuestionDetailViewTests(TestCase):
 
         Redirects to the index page.
         """
-        future_question = create_question(question_text="Future Question",
-                                          days=5)
+        future_question = create_question(question_text="Future Question", days=5)
         url = reverse("polls:detail", args=(future_question.id,))
         response = self.client.get(url)
         self.assertRedirects(response, reverse("polls:index"))
@@ -113,8 +113,7 @@ class QuestionDetailViewTests(TestCase):
 
         Displays the question's text.
         """
-        past_question = create_question(question_text="Past Question.",
-                                        days=-5)
+        past_question = create_question(question_text="Past Question.", days=-5)
         url = reverse("polls:detail", args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)

@@ -1,0 +1,33 @@
+# exclude django-generated files
+extend-exclude = [
+  "manage.py",
+  "*/migrations/*.py",
+  "/usr/*",
+  "mysite/*",
+  "*/__init__.py",
+  "*/admin.py",
+  "*/urls.py",
+  "*/apps.py",
+]
+
+target-version = "py311"
+
+[lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["E4", "E7", "E9", "F", "D"]
+ignore = []
+
+[lint.pydocstyle]
+convention = "pep257"
+
+[format]
+docstring-code-format = true
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"

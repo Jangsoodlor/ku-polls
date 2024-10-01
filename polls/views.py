@@ -7,9 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
 from django.contrib import messages
-from django.contrib.auth import user_logged_in, \
-                                user_login_failed, \
-                                user_logged_out
+from django.contrib.auth import user_logged_in, user_login_failed, user_logged_out
 from django.contrib.auth.decorators import login_required
 from django.dispatch import receiver
 from .models import Choice, Question, Vote
@@ -75,17 +73,13 @@ def vote(request, question_id):
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
     except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
-        logger.error(
-            f"Failed to get selected choice for question {question_id}"
-        )
+        logger.error(f"Failed to get selected choice for question {question_id}")
         messages.error(request, "Please re-select the choice again.")
-        return HttpResponseRedirect(reverse("polls:detail",
-                                            args=(question.id,)))
+        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
     this_user = request.user
     try:
-        vote = this_user.vote_set.get(choice__question=question,
-                                      user=this_user)
+        vote = this_user.vote_set.get(choice__question=question, user=this_user)
         vote.choice = selected_choice
         vote.save()
         vote_id = selected_choice.id
@@ -93,16 +87,22 @@ def vote(request, question_id):
             f"{this_user} changed vote to vote id: {vote_id} \
 on question id: {question.id}"
         )
-        messages.success(request, f'Your vote was changed to \
-"{selected_choice.choice_text}"')
+        messages.success(
+            request,
+            f'Your vote was changed to \
+"{selected_choice.choice_text}"',
+        )
     except Vote.DoesNotExist:
         vote = Vote.objects.create(user=this_user, choice=selected_choice)
         logger.info(
             f"{this_user} voted vote id: {selected_choice.id} \
 on question id: {question.id}"
         )
-        messages.success(request, f'You have voted \
-"{selected_choice.choice_text}"')
+        messages.success(
+            request,
+            f'You have voted \
+"{selected_choice.choice_text}"',
+        )
 
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
@@ -114,8 +114,7 @@ def unvote(request, question_id):
     this_user = request.user
 
     try:
-        vote = this_user.vote_set.get(choice__question=question,
-                                      user=this_user)
+        vote = this_user.vote_set.get(choice__question=question, user=this_user)
         logger.info(f"{this_user} deleted vote id: {vote.id} \
 on question id: {question.id}")
         vote.delete()
@@ -126,11 +125,9 @@ on question id: {question.id}")
             f"{this_user} tried to delete non-existent vote \
 on question id: {question.id}"
         )
-        return HttpResponseRedirect(reverse("polls:detail",
-                                            args=(question.id,)))
+        return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
-    return HttpResponseRedirect(reverse("polls:results",
-                                        args=(question.id,)))
+    return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
 
 def get_client_ip(request):

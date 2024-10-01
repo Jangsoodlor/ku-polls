@@ -1,4 +1,5 @@
-# KU Polls
+# Testing Branch DO NOT CLONE
+This branch is for testing ruff code formatter's github integration.
 [![Django CI](https://github.com/Jangsoodlor/ku-polls/actions/workflows/django.yml/badge.svg)](https://github.com/Jangsoodlor/ku-polls/actions/workflows/django.yml)
 [![Lint with Flake8](https://github.com/Jangsoodlor/ku-polls/actions/workflows/style-checking.yml/badge.svg)](https://github.com/Jangsoodlor/ku-polls/actions/workflows/style-checking.yml)
 
