@@ -144,7 +144,7 @@ def get_client_ip(request):
 
 @receiver(user_logged_in)
 def login_success(sender, request, user, **kwargs):
-    """Log when user successfully login"""
+    """Log when user successfully login."""
     ip_addr = get_client_ip(request)
     logger.info(f"{user.username} logged in from {ip_addr}")
 
@@ -160,5 +160,4 @@ def logout_success(sender, request, user, **kwargs):
 def login_fail(sender, credentials, request, **kwargs):
     """Log when user failed to login."""
     ip_addr = get_client_ip(request)
-    logger.warning(f"Failed login for {credentials['username']} \
-from {ip_addr}")
+    logger.warning(f"Failed login for {credentials['username']} from {ip_addr}")
