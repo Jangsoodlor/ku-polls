@@ -59,8 +59,6 @@ class DetailView(generic.DetailView):
         return data
 
 
-
-
 class ResultsView(generic.DetailView):
     """The view of the results page."""
 
