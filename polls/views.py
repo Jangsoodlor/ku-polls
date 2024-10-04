@@ -59,6 +59,8 @@ class DetailView(generic.DetailView):
         return data
 
 
+
+
 class ResultsView(generic.DetailView):
     """The view of the results page."""
 
@@ -124,7 +126,8 @@ on question id: {question.id}")
     except Vote.DoesNotExist:
         messages.error(request, "ERROR: You haven't vote yet")
         logger.error(
-            f"{this_user} tried to delete non-existent vote on question id: {question.id}"
+            f"{this_user} tried to delete non-existent\
+vote on question id: {question.id}"
         )
         return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
@@ -132,7 +135,7 @@ on question id: {question.id}")
 
 
 def get_client_ip(request):
-    """Gets the visitor’s IP address using request headers."""
+    """Get the visitor’s IP address using request headers."""
     if request:
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
