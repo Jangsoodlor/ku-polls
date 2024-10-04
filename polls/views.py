@@ -1,15 +1,17 @@
 """Contains the views of the poll application."""
 
 import logging
+
+from django.contrib import messages
+from django.contrib.auth import user_logged_in, user_logged_out, user_login_failed
+from django.contrib.auth.decorators import login_required
+from django.dispatch import receiver
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.views import generic
-from django.contrib import messages
-from django.contrib.auth import user_logged_in, user_login_failed, user_logged_out
-from django.contrib.auth.decorators import login_required
-from django.dispatch import receiver
+
 from .models import Choice, Question, Vote
 
 logger = logging.getLogger("polls")
@@ -122,8 +124,7 @@ on question id: {question.id}")
     except Vote.DoesNotExist:
         messages.error(request, "ERROR: You haven't vote yet")
         logger.error(
-            f"{this_user} tried to delete non-existent vote \
-on question id: {question.id}"
+            f"{this_user} tried to delete non-existent vote on question id: {question.id}"
         )
         return HttpResponseRedirect(reverse("polls:detail", args=(question.id,)))
 
@@ -131,7 +132,7 @@ on question id: {question.id}"
 
 
 def get_client_ip(request):
-    """Get the visitor’s IP address using request headers."""
+    """Gets the visitor’s IP address using request headers."""
     if request:
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:

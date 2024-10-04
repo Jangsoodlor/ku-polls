@@ -7,11 +7,12 @@ Then run: manage.py test auth
 """
 
 import django.test
-from django.urls import reverse
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate  # to "login" a user using code
-from polls.models import Question, Choice
+from django.contrib.auth.models import User
+from django.urls import reverse
+
 from mysite import settings
+from polls.models import Choice, Question
 
 
 class UserAuthTest(django.test.TestCase):
