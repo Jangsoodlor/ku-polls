@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  db:
+    env_file: docker.env
+    image: "postgres:17"
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PWD}"
+      POSTGRES_DB: "${DB_NAME}"
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${DB_NAME} -U ${DB_USER}"]
+      start_period: 60s
+      interval: 5s
+      timeout: 20s
+      retries: 5
+
+  app:
+    env_file: docker.env
+    build:
+      context: .
+      args:
+        secret-key: "${SECRET_KEY}"
+        hosts: "${ALLOWED_HOSTS}"
+        debug: "${DEBUG}"
+        timezone: "${TIME_ZONE}"
+    environment:
+      SECRET_KEY: "${SECRET_KEY}"
+      DEBUG: "${DEBUG}"
+      DATABASE_HOST: "db"
+      DATABASE_PORT: 5432
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PWD}"
+      ALLOWED_HOSTS: "${ALLOWED_HOSTS}"
+      TIME_ZONE: "${TIME_ZONE}"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
